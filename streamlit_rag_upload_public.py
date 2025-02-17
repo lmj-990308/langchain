@@ -3,17 +3,14 @@ import streamlit as st
 import tempfile
 
 from langchain.document_loaders import PyPDFLoader
-from langchain.text_splitters import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
-
-__import__('pysqlite3')
-import sys
-sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
-
 from langchain_chroma import Chroma
+from chromadb.config import Settings
+
 os.environ["OPENAI_API_KEY"] = st.secrets['OPENAI_API_KEY']
 
 #Chroma tenant 오류 방지 위한 코드
@@ -36,7 +33,16 @@ def load_pdf(_file):
 def create_vector_store(_docs):
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
     split_docs = text_splitter.split_documents(_docs)
-    vectorstore = Chroma.from_documents(split_docs, OpenAIEmbeddings(model='text-embedding-3-small'))
+    vectorstore = Chroma.from_documents(
+        split_docs,
+        OpenAIEmbeddings(model='text-embedding-3-small'),
+        persist_directory=None,
+        client_settings=Settings(
+            chroma_db_impl="duckdb",
+            persist_directory=None,
+            anonymized_telemetry=False
+        )
+    )
     return vectorstore
 
 #검색된 문서를 하나의 텍스트로 합치는 헬퍼 함수

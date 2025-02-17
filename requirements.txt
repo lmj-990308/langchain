@@ -4,6 +4,6 @@ langchain_community
 langchain_openai
 langchain-core
 langchain-chroma
-pysqlite3-binary
+chromadb
 pypdf
 langchain-text-splitters
