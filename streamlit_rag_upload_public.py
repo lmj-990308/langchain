@@ -33,6 +33,8 @@ def load_pdf(_file):
 def create_vector_store(_docs):
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
     split_docs = text_splitter.split_documents(_docs)
+
+    # Chroma DB 인메모리 모드 설정
     vectorstore = Chroma.from_documents(
         split_docs,
         OpenAIEmbeddings(model='text-embedding-3-small'),
