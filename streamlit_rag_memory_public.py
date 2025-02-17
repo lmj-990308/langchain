@@ -18,28 +18,21 @@ def load_and_split_pdf(file_path):
     loader = PyPDFLoader(file_path)
     return loader.load_and_split()
 
-@st.cache_resource
 def create_vector_store(_docs):
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
     split_docs = text_splitter.split_documents(_docs)
-    persist_directory = "./chroma_db"
     vectorstore = Chroma.from_documents(
         split_docs, 
         OpenAIEmbeddings(model='text-embedding-3-small'),
-        persist_directory=persist_directory
+        persist_directory=None,  # << 이 줄 추가!
+        client_settings={"chroma_db_impl": "duckdb", "persist_directory": None}  # << 중요!
     )
     return vectorstore
 
-@st.cache_resource
+
 def get_vectorstore(_docs):
-    persist_directory = "./chroma_db"
-    if os.path.exists(persist_directory):
-        return Chroma(
-            persist_directory=persist_directory,
-            embedding_function=OpenAIEmbeddings(model='text-embedding-3-small')
-        )
-    else:
-        return create_vector_store(_docs)
+    # 항상 새로 생성하도록 강제
+    return create_vector_store(_docs)
 
 st.header("헌법 Q&A 챗봇 💬 📚")
 option = st.selectbox("Select GPT Model", ("gpt-4o-mini", "gpt-3.5-turbo-0125"))

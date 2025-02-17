@@ -1,9 +1,9 @@
 streamlit
 langchain
-langchain_community
 langchain_openai
 langchain_core
 langchain_chroma
+langchain_community
 chromadb
 pypdf
 langchain_text_splitters
