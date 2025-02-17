@@ -1,4 +1,7 @@
 import os
+os.environ["CHROMADB_DB_IMPL"] = "duckdb"
+os.environ["CHROMADB_PERSIST_DIRECTORY"] = ""
+
 import streamlit as st
 import tempfile
 
